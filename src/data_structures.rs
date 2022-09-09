@@ -1,7 +1,7 @@
 use cov_viz_ds::{Bucket, ChromosomeData, Facet, Interval};
+use rustc_hash::FxHashSet;
 use serde::Serialize;
 use std::{fs, path::PathBuf};
-use rustc_hash::FxHashSet;
 
 #[derive(Serialize)]
 struct ManifestInterval {
@@ -13,7 +13,10 @@ struct ManifestInterval {
 impl ManifestInterval {
     fn from(inter: &Interval) -> Self {
         let mut bucket_list = FxHashSet::<Bucket>::default();
-        inter.values.iter().for_each(|v| bucket_list.extend(v.associated_buckets.iter()));
+        inter
+            .values
+            .iter()
+            .for_each(|v| bucket_list.extend(v.associated_buckets.iter()));
 
         ManifestInterval {
             start: inter.start,
@@ -37,19 +40,23 @@ pub struct ManifestChromosomeData {
 
 impl ManifestChromosomeData {
     pub fn from(data: &ChromosomeData) -> Self {
+        let mut si: Vec<ManifestInterval> = data
+            .source_intervals
+            .iter()
+            .map(|i| ManifestInterval::from(i))
+            .collect();
+        si.sort_by(|a, b| a.start.cmp(&b.start));
+        let mut ti: Vec<ManifestInterval> = data
+            .source_intervals
+            .iter()
+            .map(|i| ManifestInterval::from(i))
+            .collect();
+        ti.sort_by(|a, b| a.start.cmp(&b.start));
         ManifestChromosomeData {
             chrom: data.chrom.clone(),
             bucket_size: data.bucket_size,
-            source_intervals: data
-                .source_intervals
-                .iter()
-                .map(|i| ManifestInterval::from(i))
-                .collect(),
-            target_intervals: data
-                .source_intervals
-                .iter()
-                .map(|i| ManifestInterval::from(i))
-                .collect(),
+            source_intervals: si,
+            target_intervals: ti,
         }
     }
 }
