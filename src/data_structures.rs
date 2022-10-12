@@ -47,7 +47,7 @@ impl ManifestChromosomeData {
             .collect();
         si.sort_by(|a, b| a.start.cmp(&b.start));
         let mut ti: Vec<ManifestInterval> = data
-            .source_intervals
+            .target_intervals
             .iter()
             .map(|i| ManifestInterval::from(i))
             .collect();
