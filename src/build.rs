@@ -1,4 +1,4 @@
-use crate::data_structures::{Manifest, ManifestChromosomeData};
+use crate::data_structures::{GenomeInfo, Manifest, ManifestChromosomeData};
 use crate::Options;
 use cov_viz_ds::CoverageData;
 
@@ -21,6 +21,9 @@ pub fn build_manifest(data: &CoverageData, options: &Options) -> Result<Manifest
             .map(|c| ManifestChromosomeData::from(c))
             .collect(),
         facets: data.facets.clone(),
-        genome: genome_file.to_string(),
+        genome: GenomeInfo {
+            file: genome_file.to_string(),
+            name: options.genome.clone(),
+        },
     })
 }

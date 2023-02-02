@@ -62,10 +62,16 @@ impl ManifestChromosomeData {
 }
 
 #[derive(Serialize)]
+pub struct GenomeInfo {
+    pub file: String,
+    pub name: String,
+}
+
+#[derive(Serialize)]
 pub struct Manifest {
     pub chromosomes: Vec<ManifestChromosomeData>,
     pub facets: Vec<Facet>,
-    pub genome: String,
+    pub genome: GenomeInfo,
 }
 
 impl Manifest {
