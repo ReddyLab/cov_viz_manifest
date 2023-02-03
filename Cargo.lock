@@ -13,8 +13,8 @@ dependencies = [
 
 [[package]]
 name = "cov_viz_ds"
-version = "0.1.0"
-source = "git+https://github.com/ReddyLab/cov_viz_ds?rev=4fe370d94b0d863e28aa4f861d1c1dc20026f0be#4fe370d94b0d863e28aa4f861d1c1dc20026f0be"
+version = "0.1.1"
+source = "git+https://github.com/ReddyLab/cov_viz_ds?rev=e3a4b84903d23bdbc7e4f88fd24c6e5f6a91aa11#e3a4b84903d23bdbc7e4f88fd24c6e5f6a91aa11"
 dependencies = [
  "bincode",
  "rustc-hash",

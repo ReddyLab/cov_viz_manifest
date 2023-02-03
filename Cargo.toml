@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 bincode = "1.3.3"
-cov_viz_ds = { git = "https://github.com/ReddyLab/cov_viz_ds", rev = "4fe370d94b0d863e28aa4f861d1c1dc20026f0be" }
+cov_viz_ds = { git = "https://github.com/ReddyLab/cov_viz_ds", rev = "e3a4b84903d23bdbc7e4f88fd24c6e5f6a91aa11" }
 rustc-hash = "1.1.0"
 serde = { version = "1.0.137", features = ["derive"] }
 serde_json = "1.0.82"
