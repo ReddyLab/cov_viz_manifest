@@ -1,4 +1,4 @@
-use cov_viz_ds::{Bucket, ChromosomeData, Facet, Interval};
+use cov_viz_ds::{Bucket, ChromosomeData, DbID, Facet, Interval};
 use rustc_hash::FxHashSet;
 use serde::Serialize;
 use std::{fs, path::PathBuf};
@@ -11,22 +11,42 @@ struct ManifestInterval {
 }
 
 impl ManifestInterval {
-    fn from(inter: &Interval) -> Self {
+    fn from(inter: &Interval, default_facets: &FxHashSet<DbID>) -> Option<Self> {
         let mut bucket_list = FxHashSet::<Bucket>::default();
-        inter
-            .values
-            .iter()
-            .for_each(|v| bucket_list.extend(v.associated_buckets.iter()));
 
-        ManifestInterval {
+        // Filter out reg effects that don't match a default facet
+        let values_iter = inter.values.iter();
+        let mut value_count = 0;
+        if default_facets.is_empty() {
+            for value in values_iter {
+                value_count += 1;
+                bucket_list.extend(value.associated_buckets.clone())
+            }
+        } else {
+            for value in values_iter {
+                for facets in &value.facets {
+                    if facets.0.iter().any(|f| default_facets.contains(f)) {
+                        value_count += 1;
+                        bucket_list.extend(value.associated_buckets.clone());
+                        break;
+                    }
+                }
+            }
+        };
+
+        if value_count == 0 {
+            return None;
+        }
+
+        Some(ManifestInterval {
             start: inter.start,
-            count: inter.values.len(),
+            count: value_count,
             associated_buckets: bucket_list.iter().fold(Vec::<u32>::new(), |mut acc, b| {
                 acc.push(b.0 as u32);
                 acc.push(b.1);
                 acc
             }),
-        }
+        })
     }
 }
 
@@ -39,17 +59,17 @@ pub struct ManifestChromosomeData {
 }
 
 impl ManifestChromosomeData {
-    pub fn from(data: &ChromosomeData) -> Self {
+    pub fn from(data: &ChromosomeData, default_facets: &FxHashSet<DbID>) -> Self {
         let mut si: Vec<ManifestInterval> = data
             .source_intervals
             .iter()
-            .map(|i| ManifestInterval::from(i))
+            .filter_map(|i| ManifestInterval::from(i, default_facets))
             .collect();
         si.sort_by(|a, b| a.start.cmp(&b.start));
         let mut ti: Vec<ManifestInterval> = data
             .target_intervals
             .iter()
-            .map(|i| ManifestInterval::from(i))
+            .filter_map(|i| ManifestInterval::from(i, default_facets))
             .collect();
         ti.sort_by(|a, b| a.start.cmp(&b.start));
         ManifestChromosomeData {
@@ -70,6 +90,7 @@ pub struct GenomeInfo {
 #[derive(Serialize)]
 pub struct Manifest {
     pub chromosomes: Vec<ManifestChromosomeData>,
+    pub default_facets: Vec<DbID>,
     pub facets: Vec<Facet>,
     pub genome: GenomeInfo,
 }

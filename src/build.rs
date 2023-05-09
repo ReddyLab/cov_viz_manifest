@@ -18,8 +18,9 @@ pub fn build_manifest(data: &CoverageData, options: &Options) -> Result<Manifest
         chromosomes: data
             .chromosomes
             .iter()
-            .map(|c| ManifestChromosomeData::from(c))
+            .map(|c| ManifestChromosomeData::from(c, &options.default_facets))
             .collect(),
+        default_facets: options.default_facets.clone().into_iter().collect(),
         facets: data.facets.clone(),
         genome: GenomeInfo {
             file: genome_file.to_string(),
