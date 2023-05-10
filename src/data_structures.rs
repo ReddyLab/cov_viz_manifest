@@ -1,49 +1,63 @@
-use cov_viz_ds::{Bucket, ChromosomeData, DbID, Facet, Interval};
+use cov_viz_ds::{BucketLoc, ChromosomeData, DbID, Facet, Interval};
 use rustc_hash::FxHashSet;
 use serde::Serialize;
 use std::{fs, path::PathBuf};
 
 #[derive(Serialize)]
-struct ManifestInterval {
+pub struct ManifestInterval {
     start: u32,
     count: usize,
+    #[serde(skip)]
+    pub reos: FxHashSet<DbID>,
+    #[serde(skip)]
+    pub features: FxHashSet<DbID>,
     associated_buckets: Vec<u32>,
 }
 
 impl ManifestInterval {
     fn from(inter: &Interval, default_facets: &FxHashSet<DbID>) -> Option<Self> {
-        let mut bucket_list = FxHashSet::<Bucket>::default();
+        let mut bucket_list = FxHashSet::<BucketLoc>::default();
 
-        // Filter out reg effects that don't match a default facet
-        let values_iter = inter.values.iter();
-        let mut value_count = 0;
+        let features_iter = inter.values.iter();
+        let mut feature_count = 0;
+        let mut reos = FxHashSet::<DbID>::default();
+        let mut features = FxHashSet::<DbID>::default();
         if default_facets.is_empty() {
-            for value in values_iter {
-                value_count += 1;
-                bucket_list.extend(value.associated_buckets.clone())
+            for feature in features_iter {
+                feature_count += 1;
+                features.insert(feature.id);
+                for facets in &feature.facets {
+                    reos.insert(facets.reo_id);
+                }
+                bucket_list.extend(feature.associated_buckets.clone())
             }
         } else {
-            for value in values_iter {
-                for facets in &value.facets {
-                    if facets.0.iter().any(|f| default_facets.contains(f)) {
-                        value_count += 1;
-                        bucket_list.extend(value.associated_buckets.clone());
+            // Filter out REOs that don't match a default facet
+            for feature in features_iter {
+                for facets in &feature.facets {
+                    if facets.facet_ids.iter().any(|f| default_facets.contains(f)) {
+                        reos.insert(facets.reo_id);
+                        feature_count += 1;
+                        bucket_list.extend(feature.associated_buckets.clone());
+                        features.insert(feature.id);
                         break;
                     }
                 }
             }
         };
 
-        if value_count == 0 {
+        if feature_count == 0 {
             return None;
         }
 
         Some(ManifestInterval {
             start: inter.start,
-            count: value_count,
+            count: feature_count,
+            reos,
+            features,
             associated_buckets: bucket_list.iter().fold(Vec::<u32>::new(), |mut acc, b| {
-                acc.push(b.0 as u32);
-                acc.push(b.1);
+                acc.push(b.chrom as u32);
+                acc.push(b.idx);
                 acc
             }),
         })
@@ -54,8 +68,8 @@ impl ManifestInterval {
 pub struct ManifestChromosomeData {
     chrom: String,
     bucket_size: u32,
-    source_intervals: Vec<ManifestInterval>,
-    target_intervals: Vec<ManifestInterval>,
+    pub source_intervals: Vec<ManifestInterval>,
+    pub target_intervals: Vec<ManifestInterval>,
 }
 
 impl ManifestChromosomeData {
@@ -92,6 +106,9 @@ pub struct Manifest {
     pub chromosomes: Vec<ManifestChromosomeData>,
     pub default_facets: Vec<DbID>,
     pub facets: Vec<Facet>,
+    pub reo_count: u64,
+    pub source_count: u64,
+    pub target_count: u64,
     pub genome: GenomeInfo,
 }
 
