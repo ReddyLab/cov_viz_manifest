@@ -23,7 +23,7 @@ dependencies = [
 
 [[package]]
 name = "cov_viz_manifest"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "bincode",
  "cov_viz_ds",

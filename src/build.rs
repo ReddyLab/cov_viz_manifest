@@ -1,6 +1,6 @@
 use crate::data_structures::{GenomeInfo, Manifest, ManifestChromosomeData};
 use crate::Options;
-use cov_viz_ds::CoverageData;
+use cov_viz_ds::{CoverageData, DbID};
 use rustc_hash::FxHashSet;
 
 pub fn build_manifest(data: &CoverageData, options: &Options) -> Result<Manifest, std::io::Error> {
@@ -21,9 +21,9 @@ pub fn build_manifest(data: &CoverageData, options: &Options) -> Result<Manifest
         .map(|c| ManifestChromosomeData::from(c, &options.default_facets))
         .collect();
 
-    let mut reos = FxHashSet::<i64>::default();
-    let mut sources = FxHashSet::<i64>::default();
-    let mut targets = FxHashSet::<i64>::default();
+    let mut reos = FxHashSet::<DbID>::default();
+    let mut sources = FxHashSet::<DbID>::default();
+    let mut targets = FxHashSet::<DbID>::default();
     for chrom in &chromosomes {
         for interval in &chrom.source_intervals {
             reos.extend(interval.reos.clone());

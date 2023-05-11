@@ -34,14 +34,21 @@ impl ManifestInterval {
         } else {
             // Filter out REOs that don't match a default facet
             for feature in features_iter {
-                for facets in &feature.facets {
-                    if facets.facet_ids.iter().any(|f| default_facets.contains(f)) {
-                        reos.insert(facets.reo_id);
-                        feature_count += 1;
-                        bucket_list.extend(feature.associated_buckets.clone());
-                        features.insert(feature.id);
-                        break;
+                let mut feature_observed = false;
+                for observation in &feature.facets {
+                    if observation
+                        .facet_ids
+                        .iter()
+                        .any(|f| default_facets.contains(f))
+                    {
+                        reos.insert(observation.reo_id);
+                        feature_observed = true;
                     }
+                }
+                if feature_observed {
+                    feature_count += 1;
+                    features.insert(feature.id);
+                    bucket_list.extend(feature.associated_buckets.clone());
                 }
             }
         };
