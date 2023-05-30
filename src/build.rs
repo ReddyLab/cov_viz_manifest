@@ -1,6 +1,7 @@
 use crate::data_structures::{GenomeInfo, Manifest, ManifestChromosomeData};
 use crate::Options;
-use cov_viz_ds::{CoverageData, DbID};
+use cov_viz_ds::{CoverageData, DbID, Facet, FacetRange};
+use exp_viz::{filter_coverage_data, Filter};
 use rustc_hash::FxHashSet;
 
 pub fn build_manifest(data: &CoverageData, options: &Options) -> Result<Manifest, std::io::Error> {
@@ -35,10 +36,36 @@ pub fn build_manifest(data: &CoverageData, options: &Options) -> Result<Manifest
         }
     }
 
+    // Calculate the correct Significance and Effect Size values to use for the
+    // sliders. Since we're only showing the significant REOs by default the slider
+    // values should reflect that filtering.
+    let mut filter = Filter::new();
+    filter.discrete_facets = options.default_facets.clone();
+    let filtered_data = filter_coverage_data(&filter, data);
+    let facets: Vec<Facet> = data
+        .facets
+        .iter()
+        .map(|f| {
+            let mut f = f.clone();
+            if f.name == "Significance" {
+                f.range = Some(FacetRange(
+                    filtered_data.continuous_intervals.sig.0,
+                    filtered_data.continuous_intervals.sig.1,
+                ));
+            } else if f.name == "Effect Size" {
+                f.range = Some(FacetRange(
+                    filtered_data.continuous_intervals.effect.0,
+                    filtered_data.continuous_intervals.effect.1,
+                ));
+            };
+            f
+        })
+        .collect();
+
     Ok(Manifest {
         chromosomes,
         default_facets: options.default_facets.clone().into_iter().collect(),
-        facets: data.facets.clone(),
+        facets,
         reo_count: reos.len() as u64,
         source_count: sources.len() as u64,
         target_count: targets.len() as u64,

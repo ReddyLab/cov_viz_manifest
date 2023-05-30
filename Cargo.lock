@@ -23,7 +23,20 @@ dependencies = [
 
 [[package]]
 name = "cov_viz_manifest"
-version = "0.2.1"
+version = "0.2.2"
+dependencies = [
+ "bincode",
+ "cov_viz_ds",
+ "exp_viz",
+ "rustc-hash",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "exp_viz"
+version = "0.1.3"
+source = "git+https://github.com/ReddyLab/exp_viz?rev=6d55e8248cf12bbf09a00232437ef73494c3831d#6d55e8248cf12bbf09a00232437ef73494c3831d"
 dependencies = [
  "bincode",
  "cov_viz_ds",
