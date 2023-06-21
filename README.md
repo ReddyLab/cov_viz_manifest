@@ -2,7 +2,7 @@
 Generate a manifest file for experiment coverage visualization data from the CCGR Portal database.
 
 ## Usage
-    ${GENOME} ${OUTPUT_DIR}/level1.bin ${OUTPUT_DIR} ${DEFAULT_FACETS}
+
     cov_viz_manifest <assembly name ("GRCH37" or "GRCH38")> <input data> <output directory> [default selected facet value ids]
 
 
