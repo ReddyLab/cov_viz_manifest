@@ -40,7 +40,7 @@ pub fn build_manifest(data: &CoverageData, options: &Options) -> Result<Manifest
     // sliders. Since we're only showing the significant REOs by default the slider
     // values should reflect that filtering.
     let mut filter = Filter::new();
-    filter.discrete_facets = options.default_facets.clone();
+    filter.categorical_facets = options.default_facets.clone();
     let filtered_data = filter_coverage_data(&filter, data);
     let facets: Vec<Facet> = data
         .facets
@@ -49,13 +49,13 @@ pub fn build_manifest(data: &CoverageData, options: &Options) -> Result<Manifest
             let mut f = f.clone();
             if f.name == "Significance" {
                 f.range = Some(FacetRange(
-                    filtered_data.continuous_intervals.sig.0,
-                    filtered_data.continuous_intervals.sig.1,
+                    filtered_data.numeric_intervals.sig.0,
+                    filtered_data.numeric_intervals.sig.1,
                 ));
             } else if f.name == "Effect Size" {
                 f.range = Some(FacetRange(
-                    filtered_data.continuous_intervals.effect.0,
-                    filtered_data.continuous_intervals.effect.1,
+                    filtered_data.numeric_intervals.effect.0,
+                    filtered_data.numeric_intervals.effect.1,
                 ));
             };
             f
