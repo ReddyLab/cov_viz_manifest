@@ -12,6 +12,8 @@ pub struct ManifestInterval {
     #[serde(skip)]
     pub features: FxHashSet<DbID>,
     associated_buckets: Vec<u32>,
+    pub min_sig: f32,        // Lower significance values are more significant
+    pub max_abs_effect: f32, // largest absolute effect size
 }
 
 impl ManifestInterval {
@@ -22,12 +24,16 @@ impl ManifestInterval {
         let mut feature_count = 0;
         let mut reos = FxHashSet::<DbID>::default();
         let mut features = FxHashSet::<DbID>::default();
+        let mut min_interval_sig = f32::MAX; // the lower the number the greater the significance
+        let mut max_interval_effect = f32::MIN;
         if default_facets.is_empty() {
             for feature in features_iter {
                 feature_count += 1;
                 features.insert(feature.id);
                 for facets in &feature.facets {
                     reos.insert(facets.reo_id);
+                    min_interval_sig = min_interval_sig.min(facets.significance);
+                    max_interval_effect = max_interval_effect.abs().max(facets.effect_size.abs());
                 }
                 bucket_list.extend(feature.associated_buckets.clone())
             }
@@ -43,6 +49,9 @@ impl ManifestInterval {
                     {
                         reos.insert(observation.reo_id);
                         feature_observed = true;
+                        min_interval_sig = min_interval_sig.min(observation.significance);
+                        max_interval_effect =
+                            max_interval_effect.abs().max(observation.effect_size.abs());
                     }
                 }
                 if feature_observed {
@@ -67,6 +76,8 @@ impl ManifestInterval {
                 acc.push(b.idx);
                 acc
             }),
+            min_sig: min_interval_sig,
+            max_abs_effect: max_interval_effect,
         })
     }
 }
