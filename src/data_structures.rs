@@ -25,7 +25,7 @@ impl ManifestInterval {
         let mut reos = FxHashSet::<DbID>::default();
         let mut features = FxHashSet::<DbID>::default();
         let mut min_interval_sig = f32::MAX; // the lower the number the greater the significance
-        let mut max_interval_effect = f32::MIN;
+        let mut max_interval_effect: f32 = 0.0;
         if default_facets.is_empty() {
             for feature in features_iter {
                 feature_count += 1;
@@ -33,7 +33,11 @@ impl ManifestInterval {
                 for facets in &feature.facets {
                     reos.insert(facets.reo_id);
                     min_interval_sig = min_interval_sig.min(facets.significance);
-                    max_interval_effect = max_interval_effect.abs().max(facets.effect_size.abs());
+                    max_interval_effect = if max_interval_effect.abs() > facets.effect_size.abs() {
+                        max_interval_effect
+                    } else {
+                        facets.effect_size
+                    };
                 }
                 bucket_list.extend(feature.associated_buckets.clone())
             }
@@ -51,7 +55,11 @@ impl ManifestInterval {
                         feature_observed = true;
                         min_interval_sig = min_interval_sig.min(observation.significance);
                         max_interval_effect =
-                            max_interval_effect.abs().max(observation.effect_size.abs());
+                            if max_interval_effect.abs() > observation.effect_size.abs() {
+                                max_interval_effect
+                            } else {
+                                observation.effect_size
+                            };
                     }
                 }
                 if feature_observed {
