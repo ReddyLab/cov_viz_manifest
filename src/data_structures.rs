@@ -84,7 +84,9 @@ impl ManifestInterval {
                 acc.push(b.idx);
                 acc
             }),
-            max_log10_sig: -min_interval_sig.log10(),
+            max_log10_sig: -min_interval_sig
+                .max(0.0000000000000000000000000000001)
+                .log10(),
             max_abs_effect: max_interval_effect,
         })
     }
