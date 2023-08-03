@@ -49,8 +49,8 @@ pub fn build_manifest(data: &CoverageData, options: &Options) -> Result<Manifest
             let mut f = f.clone();
             if f.name == "Significance" {
                 f.range = Some(FacetRange(
-                    filtered_data.numeric_intervals.sig.0,
-                    filtered_data.numeric_intervals.sig.1,
+                    -filtered_data.numeric_intervals.sig.1.log10(),
+                    -filtered_data.numeric_intervals.sig.0.log10(),
                 ));
             } else if f.name == "Effect Size" {
                 f.range = Some(FacetRange(

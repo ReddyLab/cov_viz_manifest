@@ -12,7 +12,7 @@ pub struct ManifestInterval {
     #[serde(skip)]
     pub features: FxHashSet<DbID>,
     associated_buckets: Vec<u32>,
-    pub min_sig: f32,        // Lower significance values are more significant
+    pub max_log10_sig: f32,  // Lower significance values are more significant
     pub max_abs_effect: f32, // largest absolute effect size
 }
 
@@ -84,7 +84,7 @@ impl ManifestInterval {
                 acc.push(b.idx);
                 acc
             }),
-            min_sig: min_interval_sig,
+            max_log10_sig: -min_interval_sig.log10(),
             max_abs_effect: max_interval_effect,
         })
     }
