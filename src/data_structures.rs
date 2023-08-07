@@ -1,4 +1,5 @@
 use cov_viz_ds::{BucketLoc, ChromosomeData, DbID, Facet, Interval};
+use exp_viz::MIN_SIG;
 use rustc_hash::FxHashSet;
 use serde::Serialize;
 use std::{fs, path::PathBuf};
@@ -84,9 +85,7 @@ impl ManifestInterval {
                 acc.push(b.idx);
                 acc
             }),
-            max_log10_sig: -min_interval_sig
-                .max(0.0000000000000000000000000000001)
-                .log10(),
+            max_log10_sig: -min_interval_sig.max(MIN_SIG).log10(),
             max_abs_effect: max_interval_effect,
         })
     }

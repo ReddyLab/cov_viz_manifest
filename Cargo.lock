@@ -36,7 +36,7 @@ dependencies = [
 [[package]]
 name = "exp_viz"
 version = "0.1.8"
-source = "git+https://github.com/ReddyLab/exp_viz?rev=86b8fc0b5015e06fb89b1e462f69c7c263d75103#86b8fc0b5015e06fb89b1e462f69c7c263d75103"
+source = "git+https://github.com/ReddyLab/exp_viz?rev=44bde0878f98659f7011045c82a8d296be6381e2#44bde0878f98659f7011045c82a8d296be6381e2"
 dependencies = [
  "bincode",
  "cov_viz_ds",
