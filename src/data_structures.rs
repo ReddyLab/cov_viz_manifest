@@ -13,7 +13,7 @@ pub struct ManifestInterval {
     #[serde(skip)]
     pub features: FxHashSet<DbID>,
     associated_buckets: Vec<u32>,
-    pub max_log10_sig: f32,  // Lower significance values are more significant
+    pub max_log10_sig: f64,  // Lower significance values are more significant
     pub max_abs_effect: f32, // largest absolute effect size
 }
 
@@ -25,7 +25,7 @@ impl ManifestInterval {
         let mut feature_count = 0;
         let mut reos = FxHashSet::<DbID>::default();
         let mut features = FxHashSet::<DbID>::default();
-        let mut min_interval_sig = f32::MAX; // the lower the number the greater the significance
+        let mut min_interval_sig = f64::MAX; // the lower the number the greater the significance
         let mut max_interval_effect: f32 = 0.0;
         if default_facets.is_empty() {
             for feature in features_iter {

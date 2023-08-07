@@ -1,6 +1,6 @@
 use crate::data_structures::{GenomeInfo, Manifest, ManifestChromosomeData};
 use crate::Options;
-use cov_viz_ds::{CoverageData, DbID, Facet, FacetRange};
+use cov_viz_ds::{CoverageData, DbID, Facet, FacetRange, FacetRange64};
 use exp_viz::{filter_coverage_data, Filter};
 use rustc_hash::FxHashSet;
 
@@ -48,7 +48,7 @@ pub fn build_manifest(data: &CoverageData, options: &Options) -> Result<Manifest
         .map(|f| {
             let mut f = f.clone();
             if f.name == "Significance" {
-                f.range = Some(FacetRange(
+                f.range64 = Some(FacetRange64(
                     filtered_data.numeric_intervals.sig.0,
                     filtered_data.numeric_intervals.sig.1,
                 ));
