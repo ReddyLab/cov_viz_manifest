@@ -1,8 +1,7 @@
 use crate::data_structures::{GenomeInfo, Manifest, ManifestChromosomeData};
 use crate::Options;
-use cov_viz_ds::{CoverageData, DbID, Facet, FacetRange, FacetRange64};
+use cov_viz_ds::{CoverageData, Facet, FacetRange, FacetRange64};
 use exp_viz::{filter_coverage_data, Filter};
-use rustc_hash::FxHashSet;
 
 pub fn build_manifest(data: &CoverageData, options: &Options) -> Result<Manifest, std::io::Error> {
     let genome_file = match options.genome.as_str() {
@@ -16,32 +15,19 @@ pub fn build_manifest(data: &CoverageData, options: &Options) -> Result<Manifest
         }
     };
 
-    let chromosomes: Vec<ManifestChromosomeData> = data
-        .chromosomes
-        .iter()
-        .map(|c| ManifestChromosomeData::from(c, &options.default_facets))
-        .collect();
-
-    let mut reos = FxHashSet::<DbID>::default();
-    let mut sources = FxHashSet::<DbID>::default();
-    let mut targets = FxHashSet::<DbID>::default();
-    for chrom in &chromosomes {
-        for interval in &chrom.source_intervals {
-            reos.extend(interval.reos.clone());
-            sources.extend(interval.features.clone())
-        }
-        for interval in &chrom.target_intervals {
-            reos.extend(interval.reos.clone());
-            targets.extend(interval.features.clone())
-        }
-    }
-
     // Calculate the correct Significance and Effect Size values to use for the
     // sliders. Since we're only showing the significant REOs by default the slider
     // values should reflect that filtering.
     let mut filter = Filter::new();
     filter.categorical_facets = options.default_facets.clone();
     let filtered_data = filter_coverage_data(&filter, data);
+
+    let chromosomes: Vec<ManifestChromosomeData> = filtered_data
+        .chromosomes
+        .iter()
+        .map(|c| ManifestChromosomeData::from(c, filtered_data.bucket_size))
+        .collect();
+
     let facets: Vec<Facet> = data
         .facets
         .iter()
@@ -66,9 +52,9 @@ pub fn build_manifest(data: &CoverageData, options: &Options) -> Result<Manifest
         chromosomes,
         default_facets: options.default_facets.clone().into_iter().collect(),
         facets,
-        reo_count: reos.len() as u64,
-        source_count: sources.len() as u64,
-        target_count: targets.len() as u64,
+        reo_count: filtered_data.reo_count,
+        source_count: filtered_data.sources.len(),
+        target_count: filtered_data.targets.len(),
         genome: GenomeInfo {
             file: genome_file.to_string(),
             name: options.genome.clone(),
