@@ -20,7 +20,7 @@ pub fn build_manifest(data: &CoverageData, options: &Options) -> Result<Manifest
     // values should reflect that filtering.
     let mut filter = Filter::new();
     filter.categorical_facets = options.default_facets.clone();
-    let filtered_data = filter_coverage_data(&filter, data);
+    let filtered_data = filter_coverage_data(&filter, data, None);
 
     let chromosomes: Vec<ManifestChromosomeData> = filtered_data
         .chromosomes
