@@ -48,7 +48,7 @@ dependencies = [
 
 [[package]]
 name = "cov_viz_manifest"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
  "bincode",
  "cov_viz_ds",
@@ -99,8 +99,8 @@ checksum = "a26ae43d7bcc3b814de94796a5e736d4029efb0ee900c12e2d54c993ad1a1e07"
 
 [[package]]
 name = "exp_viz"
-version = "0.3.0"
-source = "git+https://github.com/ReddyLab/exp_viz?rev=7abf4eca583a9474214a91fe3713c04411722f2e#7abf4eca583a9474214a91fe3713c04411722f2e"
+version = "0.3.1"
+source = "git+https://github.com/ReddyLab/exp_viz?rev=a66cadd178a68d0143e8d1e70ce881b4d26e1caa#a66cadd178a68d0143e8d1e70ce881b4d26e1caa"
 dependencies = [
  "bincode",
  "cov_viz_ds",
